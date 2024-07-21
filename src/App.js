@@ -25,7 +25,7 @@ function App() {
 
     try {
       setStatus('Fetching articles...');
-      const response = await axios.post('/search_articles', { 
+      const response = await axios.post('https://jazing.pythonanywhere.com/search_articles', { 
         stock_ticker: stockTicker,
         num_articles: numArticles,
         time_frame: timeFrame
