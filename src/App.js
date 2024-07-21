@@ -25,7 +25,7 @@ function App() {
 
     try {
       setStatus('Fetching articles...');
-      const response = await axios.post('https://newstockanalysisbackend.netlify.app/search_articles', { 
+      const response = await axios.post('jazing.pythonanywhere.com/search_articles', { 
         stock_ticker: stockTicker,
         num_articles: numArticles,
         time_frame: timeFrame
