@@ -26,9 +26,10 @@
   "options": {
     "allowedHosts": [
       "localhost",
-      ".localhost"
+      ".localhost",
+	"https://jazing.pythonanywhere.com"
     ],
-    "proxy": "https://localhost:5000/"
+    "proxy": "https://jazing.pythonanywhere.com/search_articles"
   },
   "eslintConfig": {
     "extends": [
