@@ -212,8 +212,8 @@ function App() {
         </div>
       </main>
       <footer className="App-footer">
-        <p>Contact: example@email.com</p>
-        <p>Algorithm Explanation: Our AI-powered analysis uses natural language processing to evaluate stock-related news articles and provide insights.</p>
+        <p>Contact: jazing14@gmail.com</p>
+        <p> And as we stand upon the ledges of our lives with our respective similarities, it's either sadness or euphoria </p>
       </footer>
     </div>
   );
