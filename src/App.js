@@ -28,7 +28,7 @@ function App() {
 
     try {
       setStatus('Fetching articles...');
-      const response = await axios.post('http://127.0.0.1:5000/search_articles', { 
+      const response = await axios.post('https://jazing.pythonanywhere.com/search_articles', { 
         stock_ticker: stockTicker,
         num_articles: numArticles,
         start_date: startDate,
@@ -41,7 +41,7 @@ function App() {
       // Analyze each article individually
       const analyzedArticles = await Promise.all(response.data.articles.map(async (article) => {
         setStatus(`Analyzing article: ${article.title}`);
-        const analysisResponse = await axios.post('http://127.0.0.1:5000/analyze_article', {
+        const analysisResponse = await axios.post('https://jazing.pythonanywhere.com/analyze_article', {
           article,
           stock_ticker: stockTicker
         });
@@ -52,7 +52,7 @@ function App() {
       setStatus('Generating final analysis...');
       
       // Generate final analysis
-      const finalAnalysisResponse = await axios.post('http://127.0.0.1:5000/generate_final_analysis', {
+      const finalAnalysisResponse = await axios.post('https://jazing.pythonanywhere.com/generate_final_analysis', {
         articles: analyzedArticles
       });
       setFinalAnalysis(finalAnalysisResponse.data.final_analysis);
@@ -74,7 +74,7 @@ function App() {
     setShowSuggestions(true);
     if (value.length > 1) {
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/stock_suggestions?query=${value}`);
+        const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
         setSuggestions(response.data.suggestions);
       } catch (error) {
         console.error('Error fetching suggestions:', error);
@@ -98,7 +98,7 @@ function App() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:5000/status');
+        const response = await axios.get('https://jazing.pythonanywhere.com/status');
         setStatus(response.data.status);
       } catch (error) {
         console.error('Error fetching status:', error);
