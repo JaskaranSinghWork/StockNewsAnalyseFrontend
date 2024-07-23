@@ -8,7 +8,6 @@ function App() {
   const [articles, setArticles] = useState([]);
   const [numArticles, setNumArticles] = useState(5);
   const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [finalAnalysis, setFinalAnalysis] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,21 +30,34 @@ function App() {
       const response = await axios.post('https://jazing.pythonanywhere.com/search_articles', { 
         stock_ticker: stockTicker,
         num_articles: numArticles,
-        start_date: startDate,
-        end_date: endDate
+        start_date: startDate
       });
 
-      setArticles(response.data.articles);
-      setStatus('Articles fetched. Analyzing...');
+      if (response.data.articles.length < numArticles) {
+        setStatus(`Found ${response.data.articles.length} articles. This is fewer than requested. Proceeding with analysis.`);
+      } else {
+        setStatus('Articles fetched. Analyzing...');
+      }
 
       // Analyze each article individually
-      const analyzedArticles = await Promise.all(response.data.articles.map(async (article) => {
-        setStatus(`Analyzing article: ${article.title}`);
-        const analysisResponse = await axios.post('https://jazing.pythonanywhere.com/analyze_article', {
-          article,
-          stock_ticker: stockTicker
-        });
-        return analysisResponse.data;
+      const analyzedArticles = await Promise.all(response.data.articles.map(async (article, index) => {
+        setStatus(`Analyzing article ${index + 1} of ${response.data.articles.length}: ${article.title}`);
+        try {
+          const analysisResponse = await axios.post('https://jazing.pythonanywhere.com/analyze_article', {
+            article,
+            stock_ticker: stockTicker
+          });
+          return analysisResponse.data;
+        } catch (error) {
+          console.error(`Error analyzing article: ${article.title}`, error);
+          setStatus(`Failed to analyze article: ${article.title}. Skipping to next.`);
+          return {
+            ...article,
+            analysis: 'Analysis failed',
+            estimated_returns_1_month: 'N/A',
+            estimated_returns_1_year: 'N/A'
+          };
+        }
       }));
 
       setArticles(analyzedArticles);
@@ -57,7 +69,7 @@ function App() {
       });
       setFinalAnalysis(finalAnalysisResponse.data.final_analysis);
       
-      setSuccess('Articles and analysis successfully fetched and processed!');
+      setSuccess(`Successfully analyzed ${analyzedArticles.length} articles!`);
       setStatus('');
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -66,7 +78,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [stockTicker, numArticles, startDate, endDate]);
+  }, [stockTicker, numArticles, startDate]);
 
   const handleStockTickerChange = async (e) => {
     const value = e.target.value.toUpperCase();
@@ -191,16 +203,6 @@ function App() {
                 required
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="endDate">End Date:</label>
-              <input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-              />
-            </div>
             <button type="submit" disabled={loading}>
               {loading ? 'Searching...' : 'Search'}
             </button>
@@ -213,7 +215,7 @@ function App() {
       </main>
       <footer className="App-footer">
         <p>Contact: jazing14@gmail.com</p>
-        <p> And as we stand upon the ledges of our lives with our respective similarities, it's either sadness or euphoria </p>
+        <p>And as we stand upon the ledges of our lives with our respective similarities, it's either sadness or euphoria</p>
       </footer>
     </div>
   );
