@@ -1,6 +1,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
 
 body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f7f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+.App-header {
+  background-color: #1d2228;
+  color: white;
+  padding: 1rem 0;
+}
+
+.App-main {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.search-section {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  transition: all 0.3s ease;
+}
+
+.search-section.searched {
+  margin: 0 0 2rem auto;
+}
+
+.search-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.results-section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+body {
   font-family: 'Itim', cursive;
   line-height: 1.6;
   color: #6ba6b3;
