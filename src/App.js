@@ -21,7 +21,7 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [searchStartTime, setSearchStartTime] = useState(null);
 
-  const handleSubmit = useCallback(async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setHasSearched(true);
     setLoading(true);
@@ -88,25 +88,22 @@ function App() {
       setLoading(false);
       setSearchStartTime(null);
     }
-  }, [stockTicker, numArticles, startDate]);
+  };
 
-  const handleStockTickerChange = useCallback(
-    debounce(async (value) => {
-      if (value.length > 1) {
-        try {
-          const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
-          setSuggestions(response.data.suggestions);
-          setShowSuggestions(true);
-        } catch (error) {
-          console.error('Error fetching suggestions:', error);
-        }
-      } else {
-        setSuggestions([]);
-        setShowSuggestions(false);
+  const handleStockTickerChange = debounce(async (value) => {
+    if (value.length > 1) {
+      try {
+        const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
+        setSuggestions(response.data.suggestions);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
       }
-    }, 300),
-    []
-  );
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, 300);
 
   const onInputChange = (e) => {
     const value = e.target.value.toUpperCase();
