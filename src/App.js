@@ -2,13 +2,13 @@ import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import './App.css';
+import debounce from 'lodash/debounce';
 
 function App() {
   const [stockTicker, setStockTicker] = useState('');
   const [articles, setArticles] = useState([]);
   const [numArticles, setNumArticles] = useState(5);
   const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [finalAnalysis, setFinalAnalysis] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,9 +16,11 @@ function App() {
   const [status, setStatus] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
+    setHasSearched(true);
     setLoading(true);
     setError('');
     setSuccess('');
@@ -28,36 +30,46 @@ function App() {
 
     try {
       setStatus('Fetching articles...');
-      const response = await axios.post('http://127.0.0.1:5000/search_articles', { 
+      const response = await axios.post('https://jazing.pythonanywhere.com/search_articles', { 
         stock_ticker: stockTicker,
         num_articles: numArticles,
-        start_date: startDate,
-        end_date: endDate
+        start_date: startDate
       });
 
       setArticles(response.data.articles);
-      setStatus('Articles fetched. Analyzing...');
+      setStatus(`Found ${response.data.articles.length} articles. Analyzing...`);
 
       // Analyze each article individually
-      const analyzedArticles = await Promise.all(response.data.articles.map(async (article) => {
-        setStatus(`Analyzing article: ${article.title}`);
-        const analysisResponse = await axios.post('http://127.0.0.1:5000/analyze_article', {
-          article,
-          stock_ticker: stockTicker
-        });
-        return analysisResponse.data;
+      const analyzedArticles = await Promise.all(response.data.articles.map(async (article, index) => {
+        setStatus(`Analyzing article ${index + 1} of ${response.data.articles.length}: ${article.title}`);
+        try {
+          const analysisResponse = await axios.post('https://jazing.pythonanywhere.com/analyze_article', {
+            article,
+            stock_ticker: stockTicker
+          });
+          return analysisResponse.data;
+        } catch (error) {
+          console.error(`Error analyzing article: ${article.title}`, error);
+          setStatus(`Failed to analyze article: ${article.title}. Skipping to next.`);
+          return {
+            ...article,
+            analysis: 'Analysis failed',
+            estimated_returns_1_month: 'N/A',
+            estimated_returns_1_year: 'N/A'
+          };
+        }
       }));
 
       setArticles(analyzedArticles);
       setStatus('Generating final analysis...');
       
       // Generate final analysis
-      const finalAnalysisResponse = await axios.post('http://127.0.0.1:5000/generate_final_analysis', {
+      const finalAnalysisResponse = await axios.post('https://jazing.pythonanywhere.com/generate_final_analysis', {
         articles: analyzedArticles
       });
       setFinalAnalysis(finalAnalysisResponse.data.final_analysis);
       
-      setSuccess('Articles and analysis successfully fetched and processed!');
+      setSuccess(`Successfully analyzed ${analyzedArticles.length} articles!`);
       setStatus('');
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -66,22 +78,30 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [stockTicker, numArticles, startDate, endDate]);
+  }, [stockTicker, numArticles, startDate]);
 
-  const handleStockTickerChange = async (e) => {
+  const handleStockTickerChange = useCallback(
+    debounce(async (value) => {
+      if (value.length > 1) {
+        try {
+          const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
+          setSuggestions(response.data.suggestions);
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error('Error fetching suggestions:', error);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300),
+    []
+  );
+
+  const onInputChange = (e) => {
     const value = e.target.value.toUpperCase();
     setStockTicker(value);
-    setShowSuggestions(true);
-    if (value.length > 1) {
-      try {
-        const response = await axios.get(`http://127.0.0.1:5000/stock_suggestions?query=${value}`);
-        setSuggestions(response.data.suggestions);
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-      }
-    } else {
-      setSuggestions([]);
-    }
+    handleStockTickerChange(value);
   };
 
   const handleStockTickerBlur = () => {
@@ -98,7 +118,7 @@ function App() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:5000/status');
+        const response = await axios.get('https://jazing.pythonanywhere.com/status');
         setStatus(response.data.status);
       } catch (error) {
         console.error('Error fetching status:', error);
@@ -117,35 +137,7 @@ function App() {
         <h1>Stock News Analyzer</h1>
       </header>
       <main className="App-main">
-        <div className="results-section">
-          {finalAnalysis && (
-            <section className="final-analysis">
-              <h2>Final Summary Analysis</h2>
-              {renderMarkdown(finalAnalysis)}
-            </section>
-          )}
-          {articles.length > 0 && (
-            <section className="articles">
-              <h2>Analyzed Articles</h2>
-              {articles.map((article, index) => (
-                <article key={index} className="article">
-                  <h3>{article.title}</h3>
-                  <p className="article-meta">
-                    <span>Published: {article.published_at}</span>
-                  </p>
-                  <a href={article.link} target="_blank" rel="noopener noreferrer" className="read-more">
-                    Read full article
-                  </a>
-                  <div className="article-analysis">
-                    <h4>Analysis</h4>
-                    {renderMarkdown(article.analysis)}
-                  </div>
-                </article>
-              ))}
-            </section>
-          )}
-        </div>
-        <div className="search-section">
+        <div className={`search-section ${hasSearched ? 'searched' : ''}`}>
           <form onSubmit={handleSubmit} className="search-form">
             <div className="form-group">
               <label htmlFor="stockTicker">Stock Ticker:</label>
@@ -153,7 +145,7 @@ function App() {
                 id="stockTicker"
                 type="text"
                 value={stockTicker}
-                onChange={handleStockTickerChange}
+                onChange={onInputChange}
                 onBlur={handleStockTickerBlur}
                 placeholder="e.g., AAPL"
                 required
@@ -191,16 +183,6 @@ function App() {
                 required
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="endDate">End Date:</label>
-              <input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-              />
-            </div>
             <button type="submit" disabled={loading}>
               {loading ? 'Searching...' : 'Search'}
             </button>
@@ -210,10 +192,38 @@ function App() {
           {error && <div className="error">{error}</div>}
           {success && <div className="success">{success}</div>}
         </div>
+        <div className="results-section">
+          {finalAnalysis && (
+            <section className="final-analysis">
+              <h2>Final Summary Analysis</h2>
+              {renderMarkdown(finalAnalysis)}
+            </section>
+          )}
+          {articles.length > 0 && (
+            <section className="articles">
+              <h2>Analyzed Articles</h2>
+              {articles.map((article, index) => (
+                <article key={index} className="article">
+                  <h3>{article.title}</h3>
+                  <p className="article-meta">
+                    <span>Published: {article.published_at}</span>
+                  </p>
+                  <a href={article.link} target="_blank" rel="noopener noreferrer" className="read-more">
+                    Read full article
+                  </a>
+                  <div className="article-analysis">
+                    <h4>Analysis</h4>
+                    {renderMarkdown(article.analysis)}
+                  </div>
+                </article>
+              ))}
+            </section>
+          )}
+        </div>
       </main>
       <footer className="App-footer">
-        <p>Contact: example@email.com</p>
-        <p>Algorithm Explanation: Our AI-powered analysis uses natural language processing to evaluate stock-related news articles and provide insights.</p>
+        <p>Contact: jazing14@gmail.com</p>
+        <p>And as we stand upon the ledges of our lives with our respective similarities, it's either sadness or euphoria</p>
       </footer>
     </div>
   );
