@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import './App.css';
+import debounce from 'lodash/debounce';
 
 function App() {
   const [stockTicker, setStockTicker] = useState('');
@@ -15,9 +16,11 @@ function App() {
   const [status, setStatus] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
+    setHasSearched(true);
     setLoading(true);
     setError('');
     setSuccess('');
@@ -33,11 +36,8 @@ function App() {
         start_date: startDate
       });
 
-      if (response.data.articles.length < numArticles) {
-        setStatus(`Found ${response.data.articles.length} articles. This is fewer than requested. Proceeding with analysis.`);
-      } else {
-        setStatus('Articles fetched. Analyzing...');
-      }
+      setArticles(response.data.articles);
+      setStatus(`Found ${response.data.articles.length} articles. Analyzing...`);
 
       // Analyze each article individually
       const analyzedArticles = await Promise.all(response.data.articles.map(async (article, index) => {
@@ -80,20 +80,28 @@ function App() {
     }
   }, [stockTicker, numArticles, startDate]);
 
-  const handleStockTickerChange = async (e) => {
+  const handleStockTickerChange = useCallback(
+    debounce(async (value) => {
+      if (value.length > 1) {
+        try {
+          const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
+          setSuggestions(response.data.suggestions);
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error('Error fetching suggestions:', error);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300),
+    []
+  );
+
+  const onInputChange = (e) => {
     const value = e.target.value.toUpperCase();
     setStockTicker(value);
-    setShowSuggestions(true);
-    if (value.length > 1) {
-      try {
-        const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
-        setSuggestions(response.data.suggestions);
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-      }
-    } else {
-      setSuggestions([]);
-    }
+    handleStockTickerChange(value);
   };
 
   const handleStockTickerBlur = () => {
@@ -129,35 +137,7 @@ function App() {
         <h1>Stock News Analyzer</h1>
       </header>
       <main className="App-main">
-        <div className="results-section">
-          {finalAnalysis && (
-            <section className="final-analysis">
-              <h2>Final Summary Analysis</h2>
-              {renderMarkdown(finalAnalysis)}
-            </section>
-          )}
-          {articles.length > 0 && (
-            <section className="articles">
-              <h2>Analyzed Articles</h2>
-              {articles.map((article, index) => (
-                <article key={index} className="article">
-                  <h3>{article.title}</h3>
-                  <p className="article-meta">
-                    <span>Published: {article.published_at}</span>
-                  </p>
-                  <a href={article.link} target="_blank" rel="noopener noreferrer" className="read-more">
-                    Read full article
-                  </a>
-                  <div className="article-analysis">
-                    <h4>Analysis</h4>
-                    {renderMarkdown(article.analysis)}
-                  </div>
-                </article>
-              ))}
-            </section>
-          )}
-        </div>
-        <div className="search-section">
+        <div className={`search-section ${hasSearched ? 'searched' : ''}`}>
           <form onSubmit={handleSubmit} className="search-form">
             <div className="form-group">
               <label htmlFor="stockTicker">Stock Ticker:</label>
@@ -165,7 +145,7 @@ function App() {
                 id="stockTicker"
                 type="text"
                 value={stockTicker}
-                onChange={handleStockTickerChange}
+                onChange={onInputChange}
                 onBlur={handleStockTickerBlur}
                 placeholder="e.g., AAPL"
                 required
@@ -211,6 +191,34 @@ function App() {
           {status && <div className="status">{status}</div>}
           {error && <div className="error">{error}</div>}
           {success && <div className="success">{success}</div>}
+        </div>
+        <div className="results-section">
+          {finalAnalysis && (
+            <section className="final-analysis">
+              <h2>Final Summary Analysis</h2>
+              {renderMarkdown(finalAnalysis)}
+            </section>
+          )}
+          {articles.length > 0 && (
+            <section className="articles">
+              <h2>Analyzed Articles</h2>
+              {articles.map((article, index) => (
+                <article key={index} className="article">
+                  <h3>{article.title}</h3>
+                  <p className="article-meta">
+                    <span>Published: {article.published_at}</span>
+                  </p>
+                  <a href={article.link} target="_blank" rel="noopener noreferrer" className="read-more">
+                    Read full article
+                  </a>
+                  <div className="article-analysis">
+                    <h4>Analysis</h4>
+                    {renderMarkdown(article.analysis)}
+                  </div>
+                </article>
+              ))}
+            </section>
+          )}
         </div>
       </main>
       <footer className="App-footer">
