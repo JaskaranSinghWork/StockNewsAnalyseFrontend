@@ -105,7 +105,7 @@ function App() {
         setShowSuggestions(false);
       }
     }, 300),
-    [setSuggestions, setShowSuggestions]
+    []
   );
 
   const onInputChange = (e) => {
