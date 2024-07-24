@@ -17,9 +17,6 @@ function App() {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [estimatedTime, setEstimatedTime] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [searchStartTime, setSearchStartTime] = useState(null);
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
@@ -30,12 +27,6 @@ function App() {
     setArticles([]);
     setFinalAnalysis('');
     setStatus('Initiating search...');
-    setSearchStartTime(Date.now());
-    setElapsedTime(0);
-
-    // Estimate time based on number of articles
-    const estimatedTimePerArticle = 10; // seconds
-    setEstimatedTime(numArticles * estimatedTimePerArticle);
 
     try {
       setStatus('Fetching articles...');
@@ -86,7 +77,6 @@ function App() {
       setStatus('');
     } finally {
       setLoading(false);
-      setSearchStartTime(null);
     }
   }, [stockTicker, numArticles, startDate]);
 
@@ -105,7 +95,7 @@ function App() {
         setShowSuggestions(false);
       }
     }, 300),
-    [setSuggestions, setShowSuggestions]
+    []
   );
 
   const onInputChange = (e) => {
@@ -140,17 +130,6 @@ function App() {
       return () => clearInterval(intervalId);
     }
   }, [loading]);
-
-  useEffect(() => {
-    let intervalId;
-    if (loading && searchStartTime) {
-      intervalId = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - searchStartTime) / 1000);
-        setElapsedTime(elapsed);
-      }, 1000);
-    }
-    return () => clearInterval(intervalId);
-  }, [loading, searchStartTime]);
 
   return (
     <div className="App">
@@ -208,13 +187,7 @@ function App() {
               {loading ? 'Searching...' : 'Search'}
             </button>
           </form>
-          {loading && (
-            <div className="loading">
-              <p>Fetching and analyzing articles...</p>
-              <p>Estimated time: {estimatedTime} seconds</p>
-              <p>Elapsed time: {elapsedTime} seconds</p>
-            </div>
-          )}
+          {loading && <div className="loading">Fetching and analyzing articles...</div>}
           {status && <div className="status">{status}</div>}
           {error && <div className="error">{error}</div>}
           {success && <div className="success">{success}</div>}
