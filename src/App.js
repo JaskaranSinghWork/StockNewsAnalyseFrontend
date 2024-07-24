@@ -95,7 +95,7 @@ function App() {
         setShowSuggestions(false);
       }
     }, 300),
-    []
+    [setSuggestions, setShowSuggestions]
   );
 
   const onInputChange = (e) => {
@@ -223,7 +223,14 @@ function App() {
       </main>
       <footer className="App-footer">
         <p>Contact: jazing14@gmail.com</p>
-        <p>And as we stand upon the ledges of our lives with our respective similarities, it's either sadness or euphoria</p>
+        <p>So we'll argue and we'll compromise</p>
+        <p>And realize that nothing's ever changed</p>
+        <p>For all our mutual experience</p>
+        <p>Our separate conclusions are the same</p>
+        <p>Now we are forced to recognize our inhumanity</p>
+        <p>Our reason coexists with our insanity</p>
+        <p>For all our mutual experience</p>
+        <p>Our separate conclusions are the same</p>
       </footer>
     </div>
   );
