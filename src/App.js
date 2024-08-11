@@ -253,8 +253,8 @@ function App() {
         <p>Our separate conclusions are the same</p>
         <p>Now we are forced to recognize our inhumanity</p>
         <p>Our reason coexists with our insanity</p>
-        <p>For all our mutual experience</p>
-        <p>Our separate conclusions are the same</p>
+        <p>And though we choose between reality and madness</p>
+        <p>It's either sadness or euphoria</p>
       </footer>
     </div>
   );
