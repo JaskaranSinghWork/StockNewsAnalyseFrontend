@@ -247,10 +247,10 @@ function App() {
       </main>
       <footer className="App-footer">
         <p>Powered by Google's Gemini API</p>
-        <p>Backend managed with Flask on PythonAnywhere</p>
+        <p>Backend built with Flask and hosted on PythonAnywhere</p>
         <p>Frontend built with React.js and hosted on Netlify</p>
         <p>Contact: jazing14@gmail.com</p>
-        <p>Jaskarn Singh</p>
+        <p>Jaskaran Singh</p>
       </footer>
     </div>
   );
