@@ -246,15 +246,11 @@ function App() {
         </div>
       </main>
       <footer className="App-footer">
+        <p>Powered by Google's Gemini API</p>
+        <p>Backend managed with Flask on PythonAnywhere</p>
+        <p>Frontend built with React.js and hosted on Netlify</p>
         <p>Contact: jazing14@gmail.com</p>
-        <p>So we'll argue and we'll compromise</p>
-        <p>And realize that nothing's ever changed</p>
-        <p>For all our mutual experience</p>
-        <p>Our separate conclusions are the same</p>
-        <p>Now we are forced to recognize our inhumanity</p>
-        <p>Our reason coexists with our insanity</p>
-        <p>And though we choose between reality and madness</p>
-        <p>It's either sadness or euphoria</p>
+        <p>Jaskarn Singh</p>
       </footer>
     </div>
   );
