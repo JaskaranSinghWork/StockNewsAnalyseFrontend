@@ -22,7 +22,7 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [searchStartTime, setSearchStartTime] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
-  
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -147,9 +147,34 @@ function App() {
     return () => clearInterval(intervalId);
   }, [loading, searchStartTime]);
 
-  return (
+ return (
     <div className="App">
-      {/* ... rest of the JSX ... */}
+      <header className="App-header">
+        <nav>
+          <ul>
+            <li><a href="#home" onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'active' : ''}>Home</a></li>
+            <li><a href="#features" onClick={() => setActiveTab('features')} className={activeTab === 'features' ? 'active' : ''}>Features</a></li>
+            <li><a href="#how-it-works" onClick={() => setActiveTab('how-it-works')} className={activeTab === 'how-it-works' ? 'active' : ''}>How It Works</a></li>
+            <li><a href="#pricing" onClick={() => setActiveTab('pricing')} className={activeTab === 'pricing' ? 'active' : ''}>Pricing</a></li>
+            <li><a href="#contact" onClick={() => setActiveTab('contact')} className={activeTab === 'contact' ? 'active' : ''}>Contact</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <section id="home" className="hero">
+        <div className="hero-content">
+          <h1>Discover New Investment Possibilities</h1>
+          <p>AI-powered stock analysis at your fingertips</p>
+          <div className="cta-buttons">
+            <button className="cta-primary">Start Free Trial</button>
+            <button className="cta-secondary">Learn More</button>
+          </div>
+        </div>
+        <div className="hero-image">
+          {/* Add a high-quality stock market or AI-related image here */}
+        </div>
+      </section>
+
       <section id="features" className="features">
         <h2>Features</h2>
         <div className="feature-grid">
@@ -305,4 +330,3 @@ function App() {
 }
 
 export default App;
-// End of Selection
