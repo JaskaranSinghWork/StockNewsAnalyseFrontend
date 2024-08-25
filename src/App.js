@@ -152,7 +152,7 @@ function App() {
 
       <div className="analysis-form">
         <h3>
-        Analyze articles using AI with the following steps:
+        Analyze articles using AI
     </h3>
     <ol>
         <li>Select a stock (ETFs, Indexes, etc., are not supported).</li>
@@ -164,7 +164,6 @@ function App() {
                 <li>Probability of negative impact</li>
                 <li>1-month returns</li>
                 <li>1-year projections</li>
-                <li>And more</li>
             </ul>
         </li>
         <li>A summary of all the articles will be displayed.</li>
