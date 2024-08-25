@@ -145,6 +145,16 @@ function App() {
   }, [loading, searchStartTime]);
 
   return (
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNB8YGGFM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3GNB8YGGFM');
+</script>
+  
     <div className="App">
       <header className="App-header">
         <h1>StockSense</h1>
