@@ -16,16 +16,12 @@ function App() {
   const [status, setStatus] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  // Remove the following line:
-  // const [hasSearched, setHasSearched] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [searchStartTime, setSearchStartTime] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Remove the following line:
-    // setHasSearched(true);
     setLoading(true);
     setError('');
     setSuccess('');
@@ -47,10 +43,10 @@ function App() {
       });
 
       setArticles(response.data.articles);
-      setStatus(Found ${response.data.articles.length} articles. Analyzing...);
+      setStatus(`Found ${response.data.articles.length} articles. Analyzing...`);
 
       const analyzedArticles = await Promise.all(response.data.articles.map(async (article, index) => {
-        setStatus(Analyzing article ${index + 1} of ${response.data.articles.length}: ${article.title});
+        setStatus(`Analyzing article ${index + 1} of ${response.data.articles.length}: ${article.title}`);
         try {
           const analysisResponse = await axios.post('https://jazing.pythonanywhere.com/analyze_article', {
             article,
@@ -58,8 +54,8 @@ function App() {
           });
           return analysisResponse.data;
         } catch (error) {
-          console.error(Error analyzing article: ${article.title}, error);
-          setStatus(Failed to analyze article: ${article.title}. Skipping to next.);
+          console.error(`Error analyzing article: ${article.title}`, error);
+          setStatus(`Failed to analyze article: ${article.title}. Skipping to next.`);
           return {
             ...article,
             analysis: 'Analysis failed',
@@ -77,7 +73,7 @@ function App() {
       });
       setFinalAnalysis(finalAnalysisResponse.data.final_analysis);
       
-      setSuccess(Successfully analyzed ${analyzedArticles.length} articles!);
+      setSuccess(`Successfully analyzed ${analyzedArticles.length} articles!`);
       setStatus('');
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -92,7 +88,7 @@ function App() {
   const handleStockTickerChange = debounce(async (value) => {
     if (value.length > 1) {
       try {
-        const response = await axios.get(https://jazing.pythonanywhere.com/stock_suggestions?query=${value});
+        const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
         setSuggestions(response.data.suggestions);
         setShowSuggestions(true);
       } catch (error) {
