@@ -152,8 +152,23 @@ function App() {
 
       <div className="analysis-form">
         <h3>
-        Analyze articles using AI. First, select a stock (ETFs, Indexes, etc., are not supported). Next, choose the number of articles to analyze; more articles will provide a more accurate assessment of the stock's performance. Each article takes approximately 10 seconds to process using Google's Gemini API. Then, select a date range for the articles. The AI will summarize them based on factors such as the probability of negative impact, 1-month returns, 1-year projections, and more. Finally, a summary of all the articles will be displayed.
-       </h3>
+        Analyze articles using AI with the following steps:
+    </h3>
+    <ol>
+        <li>Select a stock (ETFs, Indexes, etc., are not supported).</li>
+        <li>Choose the number of articles to analyze. More articles will provide a more accurate assessment of the stock's performance.</li>
+        <li>Each article takes approximately 10 seconds to process using Google's Gemini API.</li>
+        <li>Select a date range for the articles.</li>
+        <li>The AI will summarize the articles based on factors such as:
+            <ul>
+                <li>Probability of negative impact</li>
+                <li>1-month returns</li>
+                <li>1-year projections</li>
+                <li>And more</li>
+            </ul>
+        </li>
+        <li>A summary of all the articles will be displayed.</li>
+    </ol>
         <form onSubmit={handleSubmit} className="search-form">
           <div className="form-group">
             <label htmlFor="stockTicker">Stock Ticker:</label>
