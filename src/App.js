@@ -33,7 +33,6 @@ function App() {
     setSearchStartTime(Date.now());
     setElapsedTime(0);
 
-    // Estimate time based on number of articles
     const estimatedTimePerArticle = 10; // seconds
     setEstimatedTime(numArticles * estimatedTimePerArticle);
 
@@ -48,7 +47,6 @@ function App() {
       setArticles(response.data.articles);
       setStatus(`Found ${response.data.articles.length} articles. Analyzing...`);
 
-      // Analyze each article individually
       const analyzedArticles = await Promise.all(response.data.articles.map(async (article, index) => {
         setStatus(`Analyzing article ${index + 1} of ${response.data.articles.length}: ${article.title}`);
         try {
@@ -72,7 +70,6 @@ function App() {
       setArticles(analyzedArticles);
       setStatus('Generating final analysis...');
       
-      // Generate final analysis
       const finalAnalysisResponse = await axios.post('https://jazing.pythonanywhere.com/generate_final_analysis', {
         articles: analyzedArticles
       });
@@ -152,10 +149,44 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Stock News Analyzer</h1>
+        <h1>StockSense AI: Intelligent Stock News Analysis</h1>
+        <p className="tagline">Empowering investors with AI-driven insights from the latest stock news</p>
       </header>
       <main className="App-main">
+        <section className="hero-section">
+          <h2>Unlock the Power of AI in Stock Analysis</h2>
+          <p>StockSense AI revolutionizes how investors interpret stock news, providing deep insights and projections to inform your investment decisions.</p>
+          <button onClick={() => document.querySelector('.search-section').scrollIntoView({ behavior: 'smooth' })}>
+            Get Started
+          </button>
+        </section>
+
+        <section className="problem-solution">
+          <h2>The Problem We're Solving</h2>
+          <p>In today's fast-paced market, investors are overwhelmed by the sheer volume of news and struggle to extract meaningful insights quickly. Traditional analysis methods are time-consuming and often miss critical nuances.</p>
+          <h3>Our Solution</h3>
+          <p>StockSense AI leverages cutting-edge AI technology to analyze stock news articles, providing you with:</p>
+          <ul>
+            <li>Comprehensive analysis of article sentiment and content</li>
+            <li>Short-term and long-term return projections</li>
+            <li>Identification of key strengths, weaknesses, opportunities, and threats</li>
+            <li>Time-saving insights to inform your investment strategy</li>
+          </ul>
+        </section>
+
+        <section className="how-to-use">
+          <h2>How to Use StockSense AI</h2>
+          <ol>
+            <li>Enter a stock ticker symbol (e.g., AAPL for Apple Inc.)</li>
+            <li>Select the number of articles to analyze (1-20)</li>
+            <li>Choose a start date for the news articles</li>
+            <li>Click "Search" to initiate the AI analysis</li>
+            <li>Review the comprehensive analysis and projections</li>
+          </ol>
+        </section>
+
         <div className={`search-section ${hasSearched ? 'searched' : ''}`}>
+          <h2>Start Your AI-Powered Stock Analysis</h2>
           <form onSubmit={handleSubmit} className="search-form">
             <div className="form-group">
               <label htmlFor="stockTicker">Stock Ticker:</label>
@@ -246,11 +277,13 @@ function App() {
         </div>
       </main>
       <footer className="App-footer">
+        <h3>About StockSense AI</h3>
+        <p>StockSense AI is a cutting-edge tool that combines the power of AI with financial news analysis to provide investors with actionable insights.</p>
         <p>Powered by Google's Gemini API</p>
         <p>Backend built with Flask and hosted on PythonAnywhere</p>
         <p>Frontend built with React.js and hosted on Netlify</p>
         <p>Contact: jazing14@gmail.com</p>
-        <p>Jaskaran Singh</p>
+        <p>Developed by Jaskaran Singh</p>
       </footer>
     </div>
   );
