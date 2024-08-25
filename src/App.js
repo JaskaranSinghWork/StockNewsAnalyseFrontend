@@ -3,6 +3,7 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import debounce from 'lodash/debounce';
 import './App.css';
+import GoogleAnalytics from './GoogleAnalytics';
 
 function App() {
   const [stockTicker, setStockTicker] = useState('');
@@ -145,17 +146,9 @@ function App() {
   }, [loading, searchStartTime]);
 
   return (
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNB8YGGFM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-3GNB8YGGFM');
-</script>
   
     <div className="App">
+      <GoogleAnalytics />
       <header className="App-header">
         <h1>StockSense</h1>
       </header>
