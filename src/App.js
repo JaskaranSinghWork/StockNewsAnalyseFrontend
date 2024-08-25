@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import './App.css';
 import debounce from 'lodash/debounce';
+import './App.css';
 
 function App() {
   const [stockTicker, setStockTicker] = useState('');
@@ -19,7 +19,6 @@ function App() {
   const [estimatedTime, setEstimatedTime] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [searchStartTime, setSearchStartTime] = useState(null);
-  const [activeTab, setActiveTab] = useState('home');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -148,70 +147,11 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <nav>
-          <ul>
-            <li><button onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'active' : ''}>Home</button></li>
-            <li><button onClick={() => setActiveTab('features')} className={activeTab === 'features' ? 'active' : ''}>Features</button></li>
-            <li><button onClick={() => setActiveTab('how-it-works')} className={activeTab === 'how-it-works' ? 'active' : ''}>How It Works</button></li>
-          </ul>
-        </nav>
+        <h1>StockSense AI</h1>
       </header>
 
-      {activeTab === 'home' && (
-        <section id="home" className="hero">
-          <div className="hero-content">
-            <h1>Discover New Investment Possibilities</h1>
-            <p>AI-powered stock analysis at your fingertips</p>
-          </div>
-        </section>
-      )}
-
-      {activeTab === 'features' && (
-        <section id="features" className="features">
-          <h2>Features</h2>
-          <div className="feature-grid">
-            <div className="feature">
-              <h3>AI-Powered Analysis</h3>
-              <p>Our advanced AI analyzes multiple news articles to provide comprehensive insights on stock performance and market trends.</p>
-            </div>
-            <div className="feature">
-              <h3>Real-Time Market Insights</h3>
-              <p>Stay ahead of the curve with up-to-the-minute analysis of the latest stock news and market movements.</p>
-            </div>
-            <div className="feature">
-              <h3>Customizable Research</h3>
-              <p>Tailor your analysis by selecting the number of articles and date range to suit your investment strategy.</p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {activeTab === 'how-it-works' && (
-        <section id="how-it-works" className="how-it-works">
-          <h2>How StockSense AI Works</h2>
-          <div className="work-step">
-            <div className="step-content">
-              <h3>1. Enter Stock Information</h3>
-              <p>Input the stock ticker, select the number of articles to analyze, and choose a start date for your research.</p>
-            </div>
-          </div>
-          <div className="work-step">
-            <div className="step-content">
-              <h3>2. AI-Powered Analysis</h3>
-              <p>Our sophisticated AI scans and analyzes recent news articles, extracting key insights and sentiment.</p>
-            </div>
-          </div>
-          <div className="work-step">
-            <div className="step-content">
-              <h3>3. Receive Comprehensive Insights</h3>
-              <p>Get a detailed analysis of each article, along with a final summary to inform your investment decisions.</p>
-            </div>
-          </div>
-        </section>
-      )}
-
       <div className="analysis-form">
-        <h3>Try It Now</h3>
+        <h3>Stock Analysis</h3>
         <form onSubmit={handleSubmit} className="search-form">
           <div className="form-group">
             <label htmlFor="stockTicker">Stock Ticker:</label>
@@ -305,11 +245,8 @@ function App() {
 
       <footer className="App-footer">
         <div className="footer-content">
-          <div className="footer-links">
-            <a href="#home">Home</a>
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How It Works</a>
-          </div>
+          <p>Developed by Jaskaran Singh</p>
+          <p>Contact: jazing14@gmail.com</p>
         </div>
         <div className="footer-bottom">
           <p>&copy; 2024 StockSense AI. All rights reserved.</p>
