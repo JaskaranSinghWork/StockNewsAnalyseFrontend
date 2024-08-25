@@ -1,371 +1,396 @@
-@import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import './App.css';
+import debounce from 'lodash/debounce';
 
-/* Modern color palette */
-:root {
-    --primary-color: #2c3e50;
-    --secondary-color: #34495e;
-    --accent-color: #3498db;
-    --text-color: #333;
-    --bg-color: #f8f9fa;
-    --card-bg: #ffffff;
-    --highlight-color: #ffd7b5;
-}
+function App() {
+  const [stockTicker, setStockTicker] = useState('');
+  const [articles, setArticles] = useState([]);
+  const [numArticles, setNumArticles] = useState(5);
+  const [startDate, setStartDate] = useState('');
+  const [finalAnalysis, setFinalAnalysis] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [status, setStatus] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [estimatedTime, setEstimatedTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [searchStartTime, setSearchStartTime] = useState(null);
+  const [activeTab, setActiveTab] = useState('home');
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
 
-/* Global styles */
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    setArticles([]);
+    setFinalAnalysis('');
+    setStatus('Initiating search...');
+    setSearchStartTime(Date.now());
+    setElapsedTime(0);
 
-body {
-    font-family: 'Itim', cursive;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--bg-color);
-}
+    const estimatedTimePerArticle = 10; // seconds
+    setEstimatedTime(numArticles * estimatedTimePerArticle);
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+    try {
+      setStatus('Fetching articles...');
+      const response = await axios.post('https://jazing.pythonanywhere.com/search_articles', { 
+        stock_ticker: stockTicker,
+        num_articles: numArticles,
+        start_date: startDate
+      });
 
-/* Header styles */
-header {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    padding: 1.5rem 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+      setArticles(response.data.articles);
+      setStatus(`Found ${response.data.articles.length} articles. Analyzing...`);
 
-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
+      const analyzedArticles = await Promise.all(response.data.articles.map(async (article, index) => {
+        setStatus(`Analyzing article ${index + 1} of ${response.data.articles.length}: ${article.title}`);
+        try {
+          const analysisResponse = await axios.post('https://jazing.pythonanywhere.com/analyze_article', {
+            article,
+            stock_ticker: stockTicker
+          });
+          return analysisResponse.data;
+        } catch (error) {
+          console.error(`Error analyzing article: ${article.title}`, error);
+          setStatus(`Failed to analyze article: ${article.title}. Skipping to next.`);
+          return {
+            ...article,
+            analysis: 'Analysis failed',
+            estimated_returns_1_month: 'N/A',
+            estimated_returns_1_year: 'N/A'
+          };
+        }
+      }));
 
-nav ul {
-    list-style-type: none;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-nav ul li {
-    margin-right: 25px;
-}
-
-nav ul li a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-}
-
-nav ul li a:hover {
-    color: var(--accent-color);
-    text-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
-}
-
-/* Main content */
-main {
-    padding: 3rem 0;
-}
-
-/* Card styles */
-.card {
-    background-color: var(--card-bg);
-    border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    padding: 30px;
-    margin-bottom: 30px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
-
-.card h2 {
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-    font-weight: 600;
-}
-
-.card p {
-    margin-bottom: 1.5rem;
-    color: #555;
-}
-
-/* Button styles */
-.btn {
-    display: inline-block;
-    background-color: var(--accent-color);
-    color: #ffffff;
-    padding: 12px 24px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background-color: #2980b9;
-    box-shadow: 0 4px 8px rgba(41, 128, 185, 0.3);
-}
-
-/* Footer styles */
-footer {
-    background-color: var(--secondary-color);
-    color: #ffffff;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem;
-}
-
-/* Responsive styles */
-@media screen and (max-width: 768px) {
-    header h1 {
-        font-size: 2rem;
+      setArticles(analyzedArticles);
+      setStatus('Generating final analysis...');
+      
+      const finalAnalysisResponse = await axios.post('https://jazing.pythonanywhere.com/generate_final_analysis', {
+        articles: analyzedArticles
+      });
+      setFinalAnalysis(finalAnalysisResponse.data.final_analysis);
+      
+      setSuccess(`Successfully analyzed ${analyzedArticles.length} articles!`);
+      setStatus('');
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Failed to fetch or analyze articles. Please try again later.');
+      setStatus('');
+    } finally {
+      setLoading(false);
+      setSearchStartTime(null);
     }
+  };
 
-    nav ul {
-        flex-direction: column;
-        align-items: center;
+  const handleStockTickerChange = debounce(async (value) => {
+    if (value.length > 1) {
+      try {
+        const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
+        setSuggestions(response.data.suggestions);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
     }
+  }, 300);
 
-    nav ul li {
-        margin: 0.5rem 0;
+  const onInputChange = (e) => {
+    const value = e.target.value.toUpperCase();
+    setStockTicker(value);
+    handleStockTickerChange(value);
+  };
+
+  const handleStockTickerBlur = () => {
+    setTimeout(() => setShowSuggestions(false), 200);
+  };
+
+  const renderMarkdown = (content) => {
+    if (typeof content === 'string') {
+      return <ReactMarkdown>{content}</ReactMarkdown>;
     }
+    return <p>{JSON.stringify(content)}</p>;
+  };
 
-    .card {
-        width: 100%;
-        margin-bottom: 2rem;
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await axios.get('https://jazing.pythonanywhere.com/status');
+        setStatus(response.data.status);
+      } catch (error) {
+        console.error('Error fetching status:', error);
+      }
+    };
+
+    if (loading) {
+      const intervalId = setInterval(fetchStatus, 5000);
+      return () => clearInterval(intervalId);
     }
+  }, [loading]);
 
-    .btn {
-        width: 100%;
-        text-align: center;
+  useEffect(() => {
+    let intervalId;
+    if (loading && searchStartTime) {
+      intervalId = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - searchStartTime) / 1000);
+        setElapsedTime(elapsed);
+      }, 1000);
     }
-}
+    return () => clearInterval(intervalId);
+  }, [loading, searchStartTime]);
 
-@media screen and (max-width: 480px) {
-    header h1 {
-        font-size: 1.5rem;
+  const handleContactChange = (e) => {
+    setContactForm({
+      ...contactForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('https://jazing.pythonanywhere.com/submit_contact', contactForm);
+      if (response.data.success) {
+        setSuccess('Thank you for your message. We will get back to you soon!');
+        setContactForm({ name: '', email: '', message: '' });
+      } else {
+        setError('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      setError('An error occurred. Please try again later.');
     }
+  };
 
-    .card h2 {
-        font-size: 1.5rem;
-    }
+  return (
+    <div className="App">
+      <header className="App-header">
+        <nav>
+          <ul>
+            <li><button onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'active' : ''}>Home</button></li>
+            <li><button onClick={() => setActiveTab('features')} className={activeTab === 'features' ? 'active' : ''}>Features</button></li>
+            <li><button onClick={() => setActiveTab('how-it-works')} className={activeTab === 'how-it-works' ? 'active' : ''}>How It Works</button></li>
+            <li><button onClick={() => setActiveTab('contact')} className={activeTab === 'contact' ? 'active' : ''}>Contact</button></li>
+          </ul>
+        </nav>
+      </header>
+
+      {activeTab === 'home' && (
+        <section id="home" className="hero">
+          <div className="hero-content">
+            <h1>Discover New Investment Possibilities</h1>
+            <p>AI-powered stock analysis at your fingertips</p>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'features' && (
+        <section id="features" className="features">
+          <h2>Features</h2>
+          <div className="feature-grid">
+            <div className="feature">
+              <h3>Advanced AI Analysis</h3>
+              <p>Our cutting-edge AI technology analyzes thousands of news articles and financial reports in real-time to provide you with the most comprehensive and accurate stock insights.</p>
+            </div>
+            <div className="feature">
+              <h3>Predictive Market Trends</h3>
+              <p>Leverage machine learning algorithms to identify emerging market trends and potential investment opportunities before they become mainstream.</p>
+            </div>
+            <div className="feature">
+              <h3>Personalized Investment Recommendations</h3>
+              <p>Receive tailored stock recommendations based on your investment goals, risk tolerance, and market conditions.</p>
+            </div>
+            <div className="feature">
+              <h3>Real-Time Alerts</h3>
+              <p>Stay informed with instant notifications on significant market movements, breaking news, and changes in your watchlist stocks.</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'how-it-works' && (
+        <section id="how-it-works" className="how-it-works">
+          <h2>How StockSense AI Works</h2>
+          <div className="work-step">
+            <div className="step-content">
+              <h3>1. Data Collection</h3>
+              <p>Our AI continuously gathers data from various sources including financial news, company reports, social media sentiment, and market indicators.</p>
+            </div>
+          </div>
+          <div className="work-step">
+            <div className="step-content">
+              <h3>2. Advanced Analysis</h3>
+              <p>Using natural language processing and machine learning algorithms, we analyze the collected data to extract meaningful insights and patterns.</p>
+            </div>
+          </div>
+          <div className="work-step">
+            <div className="step-content">
+              <h3>3. Predictive Modeling</h3>
+              <p>Our AI models use historical data and current trends to generate accurate predictions about stock performance and market movements.</p>
+            </div>
+          </div>
+          <div className="work-step">
+            <div className="step-content">
+              <h3>4. Personalized Insights</h3>
+              <p>We deliver tailored recommendations and insights based on your specific investment profile and goals.</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'contact' && (
+        <section id="contact" className="contact">
+          <h2>Contact Us</h2>
+          <form onSubmit={handleContactSubmit}>
+            <input
+              type="text"
+              name="name"
+              value={contactForm.name}
+              onChange={handleContactChange}
+              placeholder="Name"
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              value={contactForm.email}
+              onChange={handleContactChange}
+              placeholder="Email"
+              required
+            />
+            <textarea
+              name="message"
+              value={contactForm.message}
+              onChange={handleContactChange}
+              placeholder="Message"
+              required
+            ></textarea>
+            <button type="submit">Send</button>
+          </form>
+          {success && <div className="success">{success}</div>}
+          {error && <div className="error">{error}</div>}
+        </section>
+      )}
+
+      <div className="analysis-form">
+        <h3>Try It Now</h3>
+        <form onSubmit={handleSubmit} className="search-form">
+          <div className="form-group">
+            <label htmlFor="stockTicker">Stock Ticker:</label>
+            <input
+              id="stockTicker"
+              type="text"
+              value={stockTicker}
+              onChange={onInputChange}
+              onBlur={handleStockTickerBlur}
+              placeholder="e.g., AAPL"
+              required
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className="suggestions">
+                {suggestions.map((suggestion, index) => (
+                  <li key={index} onClick={() => {
+                    setStockTicker(suggestion);
+                    setShowSuggestions(false);
+                  }}>{suggestion}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="form-group">
+            <label htmlFor="numArticles">Number of Articles: {numArticles}</label>
+            <input
+              id="numArticles"
+              type="range"
+              min="1"
+              max="20"
+              value={numArticles}
+              onChange={(e) => setNumArticles(Number(e.target.value))}
+              className="range-slider"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="startDate">Start Date:</label>
+            <input
+              id="startDate"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Analyzing...' : 'Analyze'}
+          </button>
+        </form>
+        {loading && (
+          <div className="loading">
+            <p>Fetching and analyzing articles...</p>
+            <p>Estimated time: {estimatedTime} seconds</p>
+            <p>Elapsed time: {elapsedTime} seconds</p>
+          </div>
+        )}
+        {status && <div className="status">{status}</div>}
+        {error && <div className="error">{error}</div>}
+        {success && <div className="success">{success}</div>}
+      </div>
+
+      {finalAnalysis && (
+        <section className="analysis-results">
+          <h2>Analysis Results</h2>
+          <div className="final-analysis">
+            <h3>Final Summary Analysis</h3>
+            {renderMarkdown(finalAnalysis)}
+          </div>
+          {articles.length > 0 && (
+            <div className="analyzed-articles">
+              <h3>Analyzed Articles</h3>
+              {articles.map((article, index) => (
+                <article key={index} className="article">
+                  <h4>{article.title}</h4>
+                  <p className="article-meta">
+                    <span>Published: {article.published_at}</span>
+                  </p>
+                  <a href={article.link} target="_blank" rel="noopener noreferrer" className="read-more">
+                    Read full article
+                  </a>
+                  <div className="article-analysis">
+                    <h5>Analysis</h5>
+                    {renderMarkdown(article.analysis)}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      <footer className="App-footer">
+        <div className="footer-content">
+          <div className="footer-links">
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>&copy; 2024 StockSense AI. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
 }
 
-/* Additional styles for app-specific elements */
-.App {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.App-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.App-main {
-    display: flex;
-    gap: 2rem;
-}
-
-.search-section {
-    flex: 1;
-    order: 2;
-}
-
-.results-section {
-    flex: 2;
-    order: 1;
-}
-
-.search-form {
-    background-color: var(--highlight-color);
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--primary-color);
-}
-
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="range"] {
-    width: 100%;
-    padding: 10px;
-    border: 2px solid var(--primary-color);
-    background-color: #fff6ed;
-    color: var(--text-color);
-    border-radius: 10px;
-    box-sizing: border-box;
-}
-
-input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 10px;
-    border-radius: 5px;
-    background: var(--highlight-color);
-    outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    cursor: pointer;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: var(--primary-color);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #d88d6a;
-}
-
-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.loading, .error, .success, .status {
-    padding: 10px;
-    margin-bottom: 1rem;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.loading {
-    background-color: var(--highlight-color);
-}
-
-.error {
-    background-color: #ffb3ba;
-}
-
-.success {
-    background-color: #baffc9;
-}
-
-.status {
-    background-color: #bae1ff;
-}
-
-.final-analysis, .article {
-    background-color: #fff6ed;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.article-meta {
-    color: var(--primary-color);
-    font-size: 0.9rem;
-}
-
-.read-more {
-    display: inline-block;
-    margin: 1rem 0;
-    color: var(--text-color);
-    text-decoration: none;
-}
-
-.article-analysis {
-    background-color: var(--highlight-color);
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 1rem;
-}
-
-.suggestions {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    background-color: #fff6ed;
-    border: 2px solid var(--primary-color);
-    border-top: none;
-    border-radius: 0 0 10px 10px;
-}
-
-.suggestions li {
-    padding: 10px;
-    cursor: pointer;
-}
-
-.suggestions li:hover {
-    background-color: var(--highlight-color);
-}
-
-.App-footer {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--primary-color);
-    color: var(--text-color);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.article {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Responsive design improvements */
-@media screen and (max-width: 768px) {
-    .App-main {
-        flex-direction: column;
-    }
-
-    .search-section, .results-section {
-        width: 100%;
-        order: unset;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .search-form {
-        padding: 15px;
-    }
-}
+export default App;
