@@ -20,8 +20,6 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [searchStartTime, setSearchStartTime] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
-  const [contactStatus, setContactStatus] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -120,23 +118,6 @@ function App() {
     return <p>{JSON.stringify(content)}</p>;
   };
 
-  const handleContactSubmit = async (e) => {
-    e.preventDefault();
-    setContactStatus('Sending...');
-    try {
-      await axios.post('https://jazing.pythonanywhere.com/contact', contactForm);
-      setContactStatus('Message sent successfully!');
-      setContactForm({ name: '', email: '', message: '' });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setContactStatus('Failed to send message. Please try again.');
-    }
-  };
-
-  const handleContactChange = (e) => {
-    setContactForm({ ...contactForm, [e.target.name]: e.target.value });
-  };
-
   useEffect(() => {
     const fetchStatus = async () => {
       try {
@@ -172,7 +153,6 @@ function App() {
             <li><button onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'active' : ''}>Home</button></li>
             <li><button onClick={() => setActiveTab('features')} className={activeTab === 'features' ? 'active' : ''}>Features</button></li>
             <li><button onClick={() => setActiveTab('how-it-works')} className={activeTab === 'how-it-works' ? 'active' : ''}>How It Works</button></li>
-            <li><button onClick={() => setActiveTab('contact')} className={activeTab === 'contact' ? 'active' : ''}>Contact</button></li>
           </ul>
         </nav>
       </header>
@@ -192,19 +172,15 @@ function App() {
           <div className="feature-grid">
             <div className="feature">
               <h3>AI-Powered Analysis</h3>
-              <p>Our cutting-edge AI analyzes multiple news articles to provide comprehensive insights, giving you a competitive edge in the market.</p>
+              <p>Our advanced AI analyzes multiple news articles to provide comprehensive insights on stock performance and market trends.</p>
             </div>
             <div className="feature">
               <h3>Real-Time Market Insights</h3>
-              <p>Stay ahead of the curve with up-to-the-minute analysis of the latest stock news, ensuring you never miss a beat in the fast-paced world of finance.</p>
+              <p>Stay ahead of the curve with up-to-the-minute analysis of the latest stock news and market movements.</p>
             </div>
             <div className="feature">
-              <h3>Customizable Alerts</h3>
-              <p>Set up personalized alerts for specific stocks or market conditions, allowing you to react swiftly to opportunities and threats in your portfolio.</p>
-            </div>
-            <div className="feature">
-              <h3>Historical Data Analysis</h3>
-              <p>Leverage our powerful algorithms to analyze historical stock data, identifying trends and patterns that can inform your investment decisions.</p>
+              <h3>Customizable Research</h3>
+              <p>Tailor your analysis by selecting the number of articles and date range to suit your investment strategy.</p>
             </div>
           </div>
         </section>
@@ -215,74 +191,22 @@ function App() {
           <h2>How StockSense AI Works</h2>
           <div className="work-step">
             <div className="step-content">
-              <h3>1. Enter Stock Ticker</h3>
-              <p>Begin by entering the stock ticker symbol of the company you're interested in analyzing. Our system will instantly recognize and validate your input.</p>
+              <h3>1. Enter Stock Information</h3>
+              <p>Input the stock ticker, select the number of articles to analyze, and choose a start date for your research.</p>
             </div>
           </div>
           <div className="work-step">
             <div className="step-content">
               <h3>2. AI-Powered Analysis</h3>
-              <p>Our sophisticated AI algorithms scan and analyze recent news articles, financial reports, and market data related to your chosen stock. This process involves natural language processing and sentiment analysis to extract valuable insights.</p>
+              <p>Our sophisticated AI scans and analyzes recent news articles, extracting key insights and sentiment.</p>
             </div>
           </div>
           <div className="work-step">
             <div className="step-content">
-              <h3>3. Comprehensive Insights</h3>
-              <p>Receive a detailed analysis report that includes key metrics, sentiment scores, potential risks and opportunities, and projected market trends. Our AI provides you with actionable insights to inform your investment decisions.</p>
+              <h3>3. Receive Comprehensive Insights</h3>
+              <p>Get a detailed analysis of each article, along with a final summary to inform your investment decisions.</p>
             </div>
           </div>
-          <div className="work-step">
-            <div className="step-content">
-              <h3>4. Continuous Learning</h3>
-              <p>Our AI model continuously learns from new data and user feedback, constantly improving its accuracy and relevance to provide you with the most up-to-date and reliable analysis.</p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {activeTab === 'contact' && (
-        <section id="contact" className="contact">
-          <h2>Contact Us</h2>
-          <form onSubmit={handleContactSubmit} className="contact-form">
-            <div className="form-group">
-              <label htmlFor="name">Name:</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={contactForm.name}
-                onChange={handleContactChange}
-                required
-                placeholder="Your Name"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email:</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={contactForm.email}
-                onChange={handleContactChange}
-                required
-                placeholder="your.email@example.com"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="message">Message:</label>
-              <textarea
-                id="message"
-                name="message"
-                value={contactForm.message}
-                onChange={handleContactChange}
-                required
-                placeholder="Your message here..."
-                rows="5"
-              ></textarea>
-            </div>
-            <button type="submit" className="submit-btn">Send Message</button>
-          </form>
-          {contactStatus && <p className="contact-status">{contactStatus}</p>}
         </section>
       )}
 
@@ -333,7 +257,7 @@ function App() {
               required
             />
           </div>
-          <button type="submit" disabled={loading} className="analyze-btn">
+          <button type="submit" disabled={loading}>
             {loading ? 'Analyzing...' : 'Analyze'}
           </button>
         </form>
@@ -385,7 +309,6 @@ function App() {
             <a href="#home">Home</a>
             <a href="#features">Features</a>
             <a href="#how-it-works">How It Works</a>
-            <a href="#contact">Contact</a>
           </div>
         </div>
         <div className="footer-bottom">
