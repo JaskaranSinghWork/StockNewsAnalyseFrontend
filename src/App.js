@@ -16,14 +16,16 @@ function App() {
   const [status, setStatus] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  // Remove the following line:
+  // const [hasSearched, setHasSearched] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [searchStartTime, setSearchStartTime] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setHasSearched(true);
+    // Remove the following line:
+    // setHasSearched(true);
     setLoading(true);
     setError('');
     setSuccess('');
