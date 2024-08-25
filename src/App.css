@@ -2,13 +2,13 @@
 
 /* Cute orange color scheme */
 :root {
-    --primary-color: #FF9F1C;
-    --secondary-color: #FFBF69;
-    --accent-color: #CBF3F0;
-    --text-color: #2EC4B6;
+    --primary-color: #FD5901;
+    --secondary-color: #F78104;
+    --accent-color: #FAAB36;
+    --text-color: #005F60;
     --bg-color: #FFF8F0;
     --card-bg: #FFFFFF;
-    --highlight-color: #FFDAB9;
+    --highlight-color: #249EA0;
 }
 
 /* Global styles */
@@ -57,7 +57,7 @@ main {
 .card {
     background-color: var(--card-bg);
     border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(255, 159, 28, 0.1);
+    box-shadow: 0 10px 20px rgba(253, 89, 1, 0.1);
     padding: 30px;
     margin-bottom: 30px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -65,7 +65,7 @@ main {
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(255, 159, 28, 0.2);
+    box-shadow: 0 15px 30px rgba(253, 89, 1, 0.2);
 }
 
 .card h2 {
@@ -96,7 +96,7 @@ main {
 
 .btn:hover {
     background-color: var(--secondary-color);
-    box-shadow: 0 4px 8px rgba(255, 159, 28, 0.3);
+    box-shadow: 0 4px 8px rgba(253, 89, 1, 0.3);
 }
 
 /* Footer styles */
@@ -133,11 +133,11 @@ footer {
 }
 
 .search-form {
-    background-color: var(--highlight-color);
+    background-color: var(--accent-color);
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(255, 159, 28, 0.1);
+    box-shadow: 0 4px 6px rgba(253, 89, 1, 0.1);
 }
 
 .form-group {
@@ -147,7 +147,7 @@ footer {
 label {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--primary-color);
+    color: var(--text-color);
 }
 
 input[type="text"],
@@ -211,7 +211,7 @@ button:disabled {
 }
 
 .loading {
-    background-color: var(--highlight-color);
+    background-color: var(--accent-color);
 }
 
 .error {
@@ -219,11 +219,11 @@ button:disabled {
 }
 
 .success {
-    background-color: #BAFFC9;
+    background-color: var(--highlight-color);
 }
 
 .status {
-    background-color: var(--accent-color);
+    background-color: var(--secondary-color);
 }
 
 .final-analysis, .article {
@@ -231,7 +231,7 @@ button:disabled {
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(255, 159, 28, 0.1);
+    box-shadow: 0 4px 6px rgba(253, 89, 1, 0.1);
 }
 
 .article-meta {
@@ -247,7 +247,7 @@ button:disabled {
 }
 
 .article-analysis {
-    background-color: var(--highlight-color);
+    background-color: var(--accent-color);
     padding: 15px;
     border-radius: 15px;
     margin-top: 1rem;
@@ -269,7 +269,7 @@ button:disabled {
 }
 
 .suggestions li:hover {
-    background-color: var(--highlight-color);
+    background-color: var(--accent-color);
 }
 
 .App-footer {
