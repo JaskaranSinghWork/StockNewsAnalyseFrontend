@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
 
-/* Cute orange color palette */
+/* Cute orange color scheme */
 :root {
-    --primary-color: #FF9933;
-    --secondary-color: #FFB366;
-    --accent-color: #FF8000;
-    --text-color: #4D3300;
-    --bg-color: #FFF5E6;
-    --card-bg: #FFFFFF;
-    --highlight-color: #FFCC99;
+    --primary-color: #FF9F1C;
+    --secondary-color: #FFBF69;
+    --accent-color: #CBF3F0;
+    --text-color: #2EC4B6;
+    --bg-color: #FFFFFF;
+    --card-bg: #FFF9EC;
+    --highlight-color: #FFCF99;
 }
 
 /* Global styles */
@@ -38,7 +38,7 @@ header {
     background-color: var(--primary-color);
     color: #ffffff;
     padding: 1.5rem 0;
-    box-shadow: 0 4px 6px rgba(255, 153, 51, 0.2);
+    box-shadow: 0 4px 6px rgba(255, 159, 28, 0.2);
 }
 
 header h1 {
@@ -68,7 +68,7 @@ nav ul li a {
 
 nav ul li a:hover {
     color: var(--accent-color);
-    text-shadow: 0 0 8px rgba(255, 128, 0, 0.5);
+    text-shadow: 0 0 8px rgba(203, 243, 240, 0.5);
 }
 
 /* Main content */
@@ -80,7 +80,7 @@ main {
 .card {
     background-color: var(--card-bg);
     border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(255, 153, 51, 0.1);
+    box-shadow: 0 10px 20px rgba(255, 159, 28, 0.1);
     padding: 30px;
     margin-bottom: 30px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -88,7 +88,7 @@ main {
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(255, 153, 51, 0.2);
+    box-shadow: 0 15px 30px rgba(255, 159, 28, 0.2);
 }
 
 .card h2 {
@@ -107,7 +107,7 @@ main {
 .btn {
     display: inline-block;
     background-color: var(--accent-color);
-    color: #ffffff;
+    color: var(--primary-color);
     padding: 12px 24px;
     border-radius: 25px;
     text-decoration: none;
@@ -119,13 +119,14 @@ main {
 
 .btn:hover {
     background-color: var(--primary-color);
-    box-shadow: 0 4px 8px rgba(255, 128, 0, 0.3);
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(255, 159, 28, 0.3);
 }
 
 /* Footer styles */
 footer {
     background-color: var(--secondary-color);
-    color: #ffffff;
+    color: var(--text-color);
     text-align: center;
     padding: 2rem 0;
     margin-top: 3rem;
@@ -200,7 +201,7 @@ footer {
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(255, 153, 51, 0.1);
+    box-shadow: 0 4px 6px rgba(255, 159, 28, 0.1);
 }
 
 .form-group {
@@ -210,7 +211,7 @@ footer {
 label {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--text-color);
+    color: var(--primary-color);
 }
 
 input[type="text"],
@@ -220,7 +221,7 @@ input[type="range"] {
     width: 100%;
     padding: 10px;
     border: 2px solid var(--primary-color);
-    background-color: #FFFFFF;
+    background-color: #FFF9EC;
     color: var(--text-color);
     border-radius: 10px;
     box-sizing: border-box;
@@ -248,7 +249,7 @@ input[type="range"]::-webkit-slider-thumb {
 button {
     width: 100%;
     padding: 10px;
-    background-color: var(--accent-color);
+    background-color: var(--primary-color);
     color: #fff;
     border: none;
     border-radius: 25px;
@@ -258,11 +259,11 @@ button {
 }
 
 button:hover {
-    background-color: var(--primary-color);
+    background-color: var(--secondary-color);
 }
 
 button:disabled {
-    background-color: #FFD699;
+    background-color: #ccc;
     cursor: not-allowed;
 }
 
@@ -278,23 +279,23 @@ button:disabled {
 }
 
 .error {
-    background-color: #FFCCCC;
+    background-color: #FF6B6B;
 }
 
 .success {
-    background-color: #CCFFCC;
+    background-color: #4ECDC4;
 }
 
 .status {
-    background-color: #CCE5FF;
+    background-color: var(--accent-color);
 }
 
 .final-analysis, .article {
-    background-color: #FFFFFF;
+    background-color: var(--card-bg);
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(255, 153, 51, 0.1);
+    box-shadow: 0 4px 6px rgba(255, 159, 28, 0.1);
 }
 
 .article-meta {
@@ -305,7 +306,7 @@ button:disabled {
 .read-more {
     display: inline-block;
     margin: 1rem 0;
-    color: var(--accent-color);
+    color: var(--text-color);
     text-decoration: none;
 }
 
@@ -320,7 +321,7 @@ button:disabled {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    background-color: #FFFFFF;
+    background-color: var(--card-bg);
     border: 2px solid var(--primary-color);
     border-top: none;
     border-radius: 0 0 10px 10px;
