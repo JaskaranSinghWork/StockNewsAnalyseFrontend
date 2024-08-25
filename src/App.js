@@ -3,7 +3,8 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import './App.css';
 import debounce from 'lodash/debounce';
-import { FaChartLine, FaBell, FaSearch, FaBookOpen, FaLock } from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChartLine, faBell, faSearch, faBookOpen, faLock } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const [stockTicker, setStockTicker] = useState('');
@@ -21,7 +22,7 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [searchStartTime, setSearchStartTime] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
-
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -146,59 +147,34 @@ function App() {
     return () => clearInterval(intervalId);
   }, [loading, searchStartTime]);
 
- return (
+  return (
     <div className="App">
-      <header className="App-header">
-        <nav>
-          <ul>
-            <li><a href="#home" onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'active' : ''}>Home</a></li>
-            <li><a href="#features" onClick={() => setActiveTab('features')} className={activeTab === 'features' ? 'active' : ''}>Features</a></li>
-            <li><a href="#how-it-works" onClick={() => setActiveTab('how-it-works')} className={activeTab === 'how-it-works' ? 'active' : ''}>How It Works</a></li>
-            <li><a href="#pricing" onClick={() => setActiveTab('pricing')} className={activeTab === 'pricing' ? 'active' : ''}>Pricing</a></li>
-            <li><a href="#contact" onClick={() => setActiveTab('contact')} className={activeTab === 'contact' ? 'active' : ''}>Contact</a></li>
-          </ul>
-        </nav>
-      </header>
-
-      <section id="home" className="hero">
-        <div className="hero-content">
-          <h1>Discover New Investment Possibilities</h1>
-          <p>AI-powered stock analysis at your fingertips</p>
-          <div className="cta-buttons">
-            <button className="cta-primary">Start Free Trial</button>
-            <button className="cta-secondary">Learn More</button>
-          </div>
-        </div>
-        <div className="hero-image">
-          {/* Add a high-quality stock market or AI-related image here */}
-        </div>
-      </section>
-
+      {/* ... rest of the JSX ... */}
       <section id="features" className="features">
         <h2>Features</h2>
         <div className="feature-grid">
           <div className="feature">
-            <FaChartLine className="feature-icon" />
+            <FontAwesomeIcon icon={faChartLine} className="feature-icon" />
             <h3>AI-Powered Analysis</h3>
             <p>Our advanced AI analyzes multiple news articles, performs sentiment analysis, and detects market trends to provide comprehensive insights.</p>
           </div>
           <div className="feature">
-            <FaBell className="feature-icon" />
+            <FontAwesomeIcon icon={faBell} className="feature-icon" />
             <h3>Customizable Alerts</h3>
             <p>Set up personalized alerts for specific stocks, price movements, volume changes, or news topics. Choose daily, weekly, or monthly notifications.</p>
           </div>
           <div className="feature">
-            <FaSearch className="feature-icon" />
+            <FontAwesomeIcon icon={faSearch} className="feature-icon" />
             <h3>Enhanced Search</h3>
             <p>Easily find and analyze any stock with our powerful search functionality and auto-suggestions.</p>
           </div>
           <div className="feature">
-            <FaBookOpen className="feature-icon" />
+            <FontAwesomeIcon icon={faBookOpen} className="feature-icon" />
             <h3>Educational Resources</h3>
             <p>Access tutorials, guides, and a comprehensive glossary to better understand stock market basics and AI-generated insights.</p>
           </div>
           <div className="feature">
-            <FaLock className="feature-icon" />
+            <FontAwesomeIcon icon={faLock} className="feature-icon" />
             <h3>Data Privacy & Security</h3>
             <p>Your data is protected with state-of-the-art security measures. We're transparent about how your information is used and stored.</p>
           </div>
