@@ -3,8 +3,6 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import './App.css';
 import debounce from 'lodash/debounce';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine, faBell, faSearch, faBookOpen, faLock } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const [stockTicker, setStockTicker] = useState('');
@@ -179,27 +177,27 @@ function App() {
         <h2>Features</h2>
         <div className="feature-grid">
           <div className="feature">
-            <FontAwesomeIcon icon={faChartLine} className="feature-icon" />
+            <span className="feature-icon">📈</span>
             <h3>AI-Powered Analysis</h3>
             <p>Our advanced AI analyzes multiple news articles, performs sentiment analysis, and detects market trends to provide comprehensive insights.</p>
           </div>
           <div className="feature">
-            <FontAwesomeIcon icon={faBell} className="feature-icon" />
+            <span className="feature-icon">🔔</span>
             <h3>Customizable Alerts</h3>
             <p>Set up personalized alerts for specific stocks, price movements, volume changes, or news topics. Choose daily, weekly, or monthly notifications.</p>
           </div>
           <div className="feature">
-            <FontAwesomeIcon icon={faSearch} className="feature-icon" />
+            <span className="feature-icon">🔍</span>
             <h3>Enhanced Search</h3>
             <p>Easily find and analyze any stock with our powerful search functionality and auto-suggestions.</p>
           </div>
           <div className="feature">
-            <FontAwesomeIcon icon={faBookOpen} className="feature-icon" />
+            <span className="feature-icon">📚</span>
             <h3>Educational Resources</h3>
             <p>Access tutorials, guides, and a comprehensive glossary to better understand stock market basics and AI-generated insights.</p>
           </div>
           <div className="feature">
-            <FontAwesomeIcon icon={faLock} className="feature-icon" />
+            <span className="feature-icon">🔒</span>
             <h3>Data Privacy & Security</h3>
             <p>Your data is protected with state-of-the-art security measures. We're transparent about how your information is used and stored.</p>
           </div>
@@ -330,3 +328,5 @@ function App() {
 }
 
 export default App;
+
+
