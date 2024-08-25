@@ -147,11 +147,13 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>StockSense AI</h1>
+        <h1>StockSense</h1>
       </header>
 
       <div className="analysis-form">
-        <h3>Stock Analysis</h3>
+        <h3>
+        Analyze articles using AI. First, select a stock (ETFs, Indexes, etc., are not supported). Next, choose the number of articles to analyze; more articles will provide a more accurate assessment of the stock's performance. Each article takes approximately 10 seconds to process using Google's Gemini API. Then, select a date range for the articles. The AI will summarize them based on factors such as the probability of negative impact, 1-month returns, 1-year projections, and more. Finally, a summary of all the articles will be displayed.
+       </h3>
         <form onSubmit={handleSubmit} className="search-form">
           <div className="form-group">
             <label htmlFor="stockTicker">Stock Ticker:</label>
