@@ -149,44 +149,79 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>StockSense AI: Intelligent Stock News Analysis</h1>
-        <p className="tagline">Empowering investors with AI-driven insights from the latest stock news</p>
-      </header>
-      <main className="App-main">
-        <section className="hero-section">
-          <h2>Unlock the Power of AI in Stock Analysis</h2>
-          <p>StockSense AI revolutionizes how investors interpret stock news, providing deep insights and projections to inform your investment decisions.</p>
-          <button onClick={() => document.querySelector('.search-section').scrollIntoView({ behavior: 'smooth' })}>
-            Get Started
-          </button>
-        </section>
-
-        <section className="problem-solution">
-          <h2>The Problem We're Solving</h2>
-          <p>In today's fast-paced market, investors are overwhelmed by the sheer volume of news and struggle to extract meaningful insights quickly. Traditional analysis methods are time-consuming and often miss critical nuances.</p>
-          <h3>Our Solution</h3>
-          <p>StockSense AI leverages cutting-edge AI technology to analyze stock news articles, providing you with:</p>
+        <nav>
           <ul>
-            <li>Comprehensive analysis of article sentiment and content</li>
-            <li>Short-term and long-term return projections</li>
-            <li>Identification of key strengths, weaknesses, opportunities, and threats</li>
-            <li>Time-saving insights to inform your investment strategy</li>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#contact">Contact</a></li>
           </ul>
-        </section>
+        </nav>
+      </header>
 
-        <section className="how-to-use">
-          <h2>How to Use StockSense AI</h2>
-          <ol>
-            <li>Enter a stock ticker symbol (e.g., AAPL for Apple Inc.)</li>
-            <li>Select the number of articles to analyze (1-20)</li>
-            <li>Choose a start date for the news articles</li>
-            <li>Click "Search" to initiate the AI analysis</li>
-            <li>Review the comprehensive analysis and projections</li>
-          </ol>
-        </section>
+      <section id="home" className="hero">
+        <div className="hero-content">
+          <h1>Discover New Investment Possibilities</h1>
+          <p>AI-powered stock analysis at your fingertips</p>
+          <div className="app-store-buttons">
+            <button className="app-store">App Store</button>
+            <button className="google-play">Google Play</button>
+          </div>
+        </div>
+        <div className="hero-image">
+          {/* Add mock-up images of your app here */}
+        </div>
+      </section>
 
-        <div className={`search-section ${hasSearched ? 'searched' : ''}`}>
-          <h2>Start Your AI-Powered Stock Analysis</h2>
+      <section className="reinventing">
+        <h2>Reinventing Stock Analysis Technology</h2>
+        <p>StockSense AI leverages cutting-edge AI to analyze stock news, providing investors with deep insights and projections to inform investment decisions.</p>
+        <button onClick={() => document.querySelector('#how-it-works').scrollIntoView({ behavior: 'smooth' })}>
+          Discover More
+        </button>
+      </section>
+
+      <section id="features" className="features">
+        <h2>Features</h2>
+        <div className="feature-grid">
+          <div className="feature">
+            <h3>AI-Powered Analysis</h3>
+            <p>Our advanced AI analyzes multiple news articles to provide comprehensive insights.</p>
+          </div>
+          <div className="feature">
+            <h3>24/7 Market Insights</h3>
+            <p>Stay updated with real-time analysis of the latest stock news.</p>
+          </div>
+          <div className="feature">
+            <h3>Customizable Alerts</h3>
+            <p>Set up alerts for specific stocks or market conditions.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="how-it-works">
+        <h2>How StockSense AI Works</h2>
+        <div className="work-step">
+          <div className="step-content">
+            <h3>1. Enter Stock Ticker</h3>
+            <p>Simply input the stock ticker you're interested in analyzing.</p>
+          </div>
+          <div className="step-image">
+            {/* Add a relevant app screenshot */}
+          </div>
+        </div>
+        <div className="work-step">
+          <div className="step-image">
+            {/* Add another relevant app screenshot */}
+          </div>
+          <div className="step-content">
+            <h3>2. AI-Powered Analysis</h3>
+            <p>Our AI scans and analyzes recent news articles related to the stock.</p>
+          </div>
+        </div>
+        
+        <div className="analysis-form">
+          <h3>Try It Now</h3>
           <form onSubmit={handleSubmit} className="search-form">
             <div className="form-group">
               <label htmlFor="stockTicker">Stock Ticker:</label>
@@ -233,7 +268,7 @@ function App() {
               />
             </div>
             <button type="submit" disabled={loading}>
-              {loading ? 'Searching...' : 'Search'}
+              {loading ? 'Analyzing...' : 'Analyze'}
             </button>
           </form>
           {loading && (
@@ -247,19 +282,21 @@ function App() {
           {error && <div className="error">{error}</div>}
           {success && <div className="success">{success}</div>}
         </div>
-        <div className="results-section">
-          {finalAnalysis && (
-            <section className="final-analysis">
-              <h2>Final Summary Analysis</h2>
-              {renderMarkdown(finalAnalysis)}
-            </section>
-          )}
+      </section>
+
+      {finalAnalysis && (
+        <section className="analysis-results">
+          <h2>Analysis Results</h2>
+          <div className="final-analysis">
+            <h3>Final Summary Analysis</h3>
+            {renderMarkdown(finalAnalysis)}
+          </div>
           {articles.length > 0 && (
-            <section className="articles">
-              <h2>Analyzed Articles</h2>
+            <div className="analyzed-articles">
+              <h3>Analyzed Articles</h3>
               {articles.map((article, index) => (
                 <article key={index} className="article">
-                  <h3>{article.title}</h3>
+                  <h4>{article.title}</h4>
                   <p className="article-meta">
                     <span>Published: {article.published_at}</span>
                   </p>
@@ -267,23 +304,60 @@ function App() {
                     Read full article
                   </a>
                   <div className="article-analysis">
-                    <h4>Analysis</h4>
+                    <h5>Analysis</h5>
                     {renderMarkdown(article.analysis)}
                   </div>
                 </article>
               ))}
-            </section>
+            </div>
           )}
+        </section>
+      )}
+
+      <section className="our-story">
+        <h2>Our Story</h2>
+        <p>Born from the need for more intelligent stock analysis, StockSense AI aims to empower investors with AI-driven insights.</p>
+      </section>
+
+      <section className="testimonials">
+        <h2>Satisfied Customers</h2>
+        <div className="testimonial-grid">
+          {/* Add 3 testimonial boxes here */}
         </div>
-      </main>
+      </section>
+
+      <section id="contact" className="contact">
+        <h2>For Any Assistance Required Please Reach Out</h2>
+        <form>
+          <input type="text" placeholder="Name" required />
+          <input type="email" placeholder="Email" required />
+          <textarea placeholder="Message" required></textarea>
+          <button type="submit">Send</button>
+        </form>
+      </section>
+
       <footer className="App-footer">
-        <h3>About StockSense AI</h3>
-        <p>StockSense AI is a cutting-edge tool that combines the power of AI with financial news analysis to provide investors with actionable insights.</p>
-        <p>Powered by Google's Gemini API</p>
-        <p>Backend built with Flask and hosted on PythonAnywhere</p>
-        <p>Frontend built with React.js and hosted on Netlify</p>
-        <p>Contact: jazing14@gmail.com</p>
-        <p>Developed by Jaskaran Singh</p>
+        <div className="footer-content">
+          <div className="footer-logo">
+            {/* Add your logo here */}
+          </div>
+          <div className="footer-links">
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#contact">Contact</a>
+          </div>
+          <div className="footer-social">
+            {/* Add social media icons */}
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>&copy; 2024 StockSense AI. All rights reserved.</p>
+          <div className="app-store-buttons">
+            <button className="app-store">App Store</button>
+            <button className="google-play">Google Play</button>
+          </div>
+        </div>
       </footer>
     </div>
   );
