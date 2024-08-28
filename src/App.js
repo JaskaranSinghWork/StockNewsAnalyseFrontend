@@ -1,276 +1,200 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
-import debounce from 'lodash/debounce';
 import './App.css';
+import AnalysisPage from './main';
+import ContactPage from './contact';  // Uncommented ContactPage import
+//import HowItWorksPage from './howItWorks';  // Uncommented HowItWorksPage import
+import FeaturesPage from './features';
 import GoogleAnalytics from './GoogleAnalytics';
 
 function App() {
-  const [stockTicker, setStockTicker] = useState('');
-  const [articles, setArticles] = useState([]);
-  const [numArticles, setNumArticles] = useState(5);
-  const [startDate, setStartDate] = useState('');
-  const [finalAnalysis, setFinalAnalysis] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [status, setStatus] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [estimatedTime, setEstimatedTime] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [searchStartTime, setSearchStartTime] = useState(null);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
-    setArticles([]);
-    setFinalAnalysis('');
-    setStatus('Initiating search...');
-    setSearchStartTime(Date.now());
-    setElapsedTime(0);
-
-    const estimatedTimePerArticle = 10; // seconds
-    setEstimatedTime(numArticles * estimatedTimePerArticle);
-
-    try {
-      setStatus('Fetching articles...');
-      const response = await axios.post('https://jazing.pythonanywhere.com/search_articles', { 
-        stock_ticker: stockTicker,
-        num_articles: numArticles,
-        start_date: startDate
-      });
-
-      setArticles(response.data.articles);
-      setStatus(`Found ${response.data.articles.length} articles. Analyzing...`);
-
-      const analyzedArticles = await Promise.all(response.data.articles.map(async (article, index) => {
-        setStatus(`Analyzing article ${index + 1} of ${response.data.articles.length}: ${article.title}`);
-        try {
-          const analysisResponse = await axios.post('https://jazing.pythonanywhere.com/analyze_article', {
-            article,
-            stock_ticker: stockTicker
-          });
-          return analysisResponse.data;
-        } catch (error) {
-          console.error(`Error analyzing article: ${article.title}`, error);
-          setStatus(`Failed to analyze article: ${article.title}. Skipping to next.`);
-          return {
-            ...article,
-            analysis: 'Analysis failed',
-            estimated_returns_1_month: 'N/A',
-            estimated_returns_1_year: 'N/A'
-          };
-        }
-      }));
-
-      setArticles(analyzedArticles);
-      setStatus('Generating final analysis...');
-      
-      const finalAnalysisResponse = await axios.post('https://jazing.pythonanywhere.com/generate_final_analysis', {
-        articles: analyzedArticles
-      });
-      setFinalAnalysis(finalAnalysisResponse.data.final_analysis);
-      
-      setSuccess(`Successfully analyzed ${analyzedArticles.length} articles!`);
-      setStatus('');
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('Failed to fetch or analyze articles. Please try again later.');
-      setStatus('');
-    } finally {
-      setLoading(false);
-      setSearchStartTime(null);
-    }
-  };
-
-  const handleStockTickerChange = debounce(async (value) => {
-    if (value.length > 1) {
-      try {
-        const response = await axios.get(`https://jazing.pythonanywhere.com/stock_suggestions?query=${value}`);
-        setSuggestions(response.data.suggestions);
-        setShowSuggestions(true);
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-      }
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, 300);
-
-  const onInputChange = (e) => {
-    const value = e.target.value.toUpperCase();
-    setStockTicker(value);
-    handleStockTickerChange(value);
-  };
-
-  const handleStockTickerBlur = () => {
-    setTimeout(() => setShowSuggestions(false), 200);
-  };
-
-  const renderMarkdown = (content) => {
-    if (typeof content === 'string') {
-      return <ReactMarkdown>{content}</ReactMarkdown>;
-    }
-    return <p>{JSON.stringify(content)}</p>;
-  };
+  const [currentPage, setCurrentPage] = useState('home');
+  const [analysis, setAnalysis] = useState(null);
 
   useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const response = await axios.get('https://jazing.pythonanywhere.com/status');
-        setStatus(response.data.status);
-      } catch (error) {
-        console.error('Error fetching status:', error);
-      }
-    };
-
-    if (loading) {
-      const intervalId = setInterval(fetchStatus, 5000);
-      return () => clearInterval(intervalId);
+    const storedAnalysis = localStorage.getItem('analysis');
+    if (storedAnalysis) {
+      setAnalysis(JSON.parse(storedAnalysis));
     }
-  }, [loading]);
+  }, []);
 
   useEffect(() => {
-    let intervalId;
-    if (loading && searchStartTime) {
-      intervalId = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - searchStartTime) / 1000);
-        setElapsedTime(elapsed);
-      }, 1000);
+    if (analysis) {
+      localStorage.setItem('analysis', JSON.stringify(analysis));
     }
-    return () => clearInterval(intervalId);
-  }, [loading, searchStartTime]);
+  }, [analysis]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   return (
-  
-    <div className="App">
+    <div className="App" style={{
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: '100vh',
+      fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      color: '#333',
+      backgroundColor: '#f0f4f8'
+    }}>
       <GoogleAnalytics />
-      <header className="App-header">
-        <h1>StockSense</h1>
-      </header>
-
-      <div className="analysis-form">
-        <h3>
-        Analyze articles using AI
-    </h3>
-    <ol>
-        <li>Select a stock (ETFs, Indexes, etc., are not supported).</li>
-        <li>Choose the number of articles to analyze. More articles will provide a more accurate assessment of the stock's performance.</li>
-        <li>Each article takes approximately 10 seconds to process using Google's Gemini API.</li>
-        <li>Select a date range for the articles.</li>
-        <li>The AI will summarize the articles based on factors such as:
-            <ul>
-                <li>Probability of negative impact</li>
-                <li>1-month returns</li>
-                <li>1-year projections</li>
+      <header className="App-header" style={{
+        backgroundColor: '#ffffff',
+        padding: '20px 0',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000
+      }}>
+        <div className="header-content" style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          margin: '0 auto',
+          maxWidth: '1200px',
+          padding: '0 20px'
+        }}>
+          <h1 style={{
+            margin: 0,
+            color: '#007bff',
+            fontSize: '2.2rem',
+            fontWeight: 'bold'
+          }}>StockSense AI</h1>
+          <nav>
+            <ul style={{
+              display: 'flex',
+              listStyle: 'none',
+              margin: 0,
+              padding: 0
+            }}>
+              {['Home', 'Analysis',  'Features', 'Contact'].map((item) => ( // 'How It Works',
+                <li key={item} onClick={() => handlePageChange(item.toLowerCase().replace(' ', ''))} style={{
+                  cursor: 'pointer',
+                  margin: '0 15px',
+                  fontSize: '1.1rem',
+                  color: currentPage === item.toLowerCase().replace(' ', '') ? '#007bff' : '#333',
+                  transition: 'color 0.3s ease, transform 0.3s ease',
+                  fontWeight: currentPage === item.toLowerCase().replace(' ', '') ? 'bold' : 'normal',
+                  padding: '10px',
+                  borderRadius: '5px'
+                }}>
+                  {item}
+                </li>
+              ))}
             </ul>
-        </li>
-        <li>A summary of all the articles will be displayed.</li>
-    </ol>
-        <form onSubmit={handleSubmit} className="search-form">
-          <div className="form-group">
-            <label htmlFor="stockTicker">Stock Ticker:</label>
-            <input
-              id="stockTicker"
-              type="text"
-              value={stockTicker}
-              onChange={onInputChange}
-              onBlur={handleStockTickerBlur}
-              placeholder="e.g., AAPL"
-              required
-            />
-            {showSuggestions && suggestions.length > 0 && (
-              <ul className="suggestions">
-                {suggestions.map((suggestion, index) => (
-                  <li key={index} onClick={() => {
-                    setStockTicker(suggestion);
-                    setShowSuggestions(false);
-                  }}>{suggestion}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="numArticles">Number of Articles: {numArticles}</label>
-            <input
-              id="numArticles"
-              type="range"
-              min="1"
-              max="20"
-              value={numArticles}
-              onChange={(e) => setNumArticles(Number(e.target.value))}
-              className="range-slider"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="startDate">Start Date:</label>
-            <input
-              id="startDate"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Analyzing...' : 'Analyze'}
-          </button>
-        </form>
-        {loading && (
-          <div className="loading">
-            <p>Fetching and analyzing articles...</p>
-            <p>Estimated time: {estimatedTime} seconds</p>
-            <p>Elapsed time: {elapsedTime} seconds</p>
-          </div>
-        )}
-        {status && <div className="status">{status}</div>}
-        {error && <div className="error">{error}</div>}
-        {success && <div className="success">{success}</div>}
-      </div>
-
-      {finalAnalysis && (
-        <section className="analysis-results">
-          <h2>Analysis Results</h2>
-          <div className="final-analysis">
-            <h3>Final Summary Analysis</h3>
-            {renderMarkdown(finalAnalysis)}
-          </div>
-          {articles.length > 0 && (
-            <div className="analyzed-articles">
-              <h3>Analyzed Articles</h3>
-              {articles.map((article, index) => (
-                <article key={index} className="article">
-                  <h4>{article.title}</h4>
-                  <p className="article-meta">
-                    <span>Published: {article.published_at}</span>
-                  </p>
-                  <a href={article.link} target="_blank" rel="noopener noreferrer" className="read-more">
-                    Read full article
-                  </a>
-                  <div className="article-analysis">
-                    <h5>Analysis</h5>
-                    {renderMarkdown(article.analysis)}
-                  </div>
-                </article>
+          </nav>
+        </div>
+      </header>
+      <main className="App-main" style={{
+        flex: 1,
+        padding: '40px 20px',
+        margin: '0 auto',
+        maxWidth: '1200px',
+        width: '100%',
+        paddingBottom: currentPage === 'home' ? '80px' : '20px'  // Adjust padding for footer space
+      }}>
+        {currentPage === 'home' && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center'
+          }}>
+            <h2 style={{
+              marginBottom: '30px',
+              fontSize: '2.8rem',
+              fontWeight: 'bold',
+              color: '#007bff'
+            }}>Unlock Your Stock Market Potential</h2>
+            <div style={{
+              width: '100%',
+              maxWidth: '800px',
+              margin: '0 auto',
+              position: 'relative'
+            }}>
+              <img src="path-to-your-demo-image.png" alt="Demo Coming Soon" style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '100%',
+                height: 'auto',
+                borderRadius: '10px',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }} />
+              <video controls style={{
+                width: '100%',
+                borderRadius: '10px',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }}>
+                <source src="path-to-your-demo-video.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div className="features-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '30px',
+              marginTop: '40px'
+            }}>
+              {[
+                { icon: 'chart-line', title: 'Real-time Market Analysis', description: 'Stay ahead of the market with our real-time analysis and insights.' },
+                { icon: 'calculator', title: 'Accurate Predictions', description: 'Our AI-powered predictions help you make informed investment decisions.' }
+              ].map((feature, index) => (
+                <div key={index} className="feature" style={{
+                  padding: '30px',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  textAlign: 'center'
+                }}>
+                  <i className={`fas fa-${feature.icon}`} style={{ fontSize: '36px', color: '#007bff', marginBottom: '20px' }}></i>
+                  <h3 style={{ fontSize: '1.6rem', fontWeight: 'bold', marginBottom: '15px' }}>{feature.title}</h3>
+                  <p style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>{feature.description}</p>
+                </div>
               ))}
             </div>
-          )}
-        </section>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              width: '100%',
+              marginTop: '40px'
+            }}>
+              <button onClick={() => handlePageChange('analysis')} style={{
+                padding: '15px 30px',
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                color: '#ffffff',
+                backgroundColor: '#007bff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease, transform 0.3s ease',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }}>
+                Try Now
+              </button>
+            </div>
+          </div>
+        )}
+        {currentPage === 'analysis' && <AnalysisPage analysis={analysis} setAnalysis={setAnalysis} />}
+        {/* {currentPage === 'howitworks' && <HowItWorksPage />} */}
+        {currentPage === 'features' && <FeaturesPage />}
+        {currentPage === 'contact' && <ContactPage />}
+      </main>
+      {currentPage === 'home' && (
+        <footer style={{
+          backgroundColor: '#007bff',
+          color: 'white',
+          textAlign: 'center',
+          padding: '20px 0',
+          width: '100%',
+          marginTop: '40px'  // Added marginTop for additional gap
+        }}>
+          <p style={{ margin: 0 }}>© 2024 StockSense AI. All rights reserved.</p>
+          <p style={{ margin: '10px 0 0', fontSize: '0.9rem' }}>Developed by Jaskaran Singh | Contact: <a href="mailto:jazing14@gmail.com" style={{ color: 'white', textDecoration: 'underline' }}>jazing14@gmail.com</a></p>
+        </footer>
       )}
-
-      <footer className="App-footer">
-        <div className="footer-content">
-          <p>Developed by Jaskaran Singh</p>
-          <p>Contact: jazing14@gmail.com</p>
-        </div>
-        <div className="footer-bottom">
-          <p>&copy; 2024 StockSense AI. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }
