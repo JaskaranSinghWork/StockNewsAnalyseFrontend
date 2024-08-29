@@ -5,6 +5,7 @@ import ContactPage from './contact';  // Uncommented ContactPage import
 //import HowItWorksPage from './howItWorks';  // Uncommented HowItWorksPage import
 import FeaturesPage from './features';
 import GoogleAnalytics from './GoogleAnalytics';
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
