@@ -38,6 +38,7 @@ function App() {
       backgroundColor: '#f0f4f8'
     }}>
       <GoogleAnalytics />
+      <Analytics />
       <header className="App-header" style={{
         backgroundColor: '#ffffff',
         padding: '20px 0',
